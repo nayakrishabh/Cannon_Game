@@ -4,41 +4,57 @@ using UnityEngine;
 
 public class Cannon : MonoBehaviour
 {
-    [SerializeField] private Transform fireshoot;
+    [SerializeField] private GameObject fireshoot;
     public Transform inpos;
     public float y, z;
-    private float Power = 0f;
-    private float scrollspeed = 0.2f;
-    private Transform shot;
-    // Start is called before the first frame update
-    void Start()
-    {
-        inpos = GetComponent<Transform>();
+    private float power = 350f;
+    private float delay = 4f;
+    private GameObject shot;
+    private Transform mytransform;
+    void Awake() {
+        mytransform = transform;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
-        
-        float scrollinput = 10 * Input.GetAxis("Mouse ScrollWheel");
+        float scrollinput =  Input.mouseScrollDelta.y;
+        float axisrotate = Input.GetAxis("Mouse X");
 
         if (scrollinput > 0) {
-            Power += scrollinput * scrollspeed;
-            Debug.LogError(scrollinput);
+            power += 100;
+            if(power > 2500f ) {
+                power = 2500f;
+            }
+            Debug.LogError(power);
         }
         if (scrollinput < 0) {
-            Power += scrollinput * scrollspeed;
-            Debug.LogError(scrollinput);
+            power -= 100;
+            if (power < 350f) {
+                power = 350f;
+            }
+            Debug.LogError(power);
         }
+
         if (Input.GetKeyDown(KeyCode.Mouse0)) {
             OnClickShoot();
             Rigidbody rb = shot.GetComponent<Rigidbody>();
-            rb.AddForce(new Vector3(0, y * Power, z * Power), ForceMode.Impulse);
+            rb.AddForce(inpos.forward *power, ForceMode.Force);
         }
-    }
 
+        if (axisrotate > 0) {
+            mytransform.Rotate(0, axisrotate, 0);
+        }
+        if (axisrotate < 0) {
+            mytransform.Rotate(0, axisrotate, 0);
+        }
+
+
+    }
+    
     private void OnClickShoot() {
+
         shot =  Instantiate(fireshoot, inpos.transform.position, inpos.transform.rotation);
+
+        Destroy(shot, delay);
     }
 }
